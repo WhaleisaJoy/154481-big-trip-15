@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Мария Макарова](https://up.htmlacademy.ru/ecmascript/15/user/154481).
-* Наставник: `Неизвестно`.
+* Наставник: [Виктор Кан](https://htmlacademy.ru/profile/viktorkan).
 
 ---
 
