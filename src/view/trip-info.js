@@ -1,16 +1,16 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 const createRouteTemplate = (points) => {
   const destinationNames = points.map((point) => point.destination.name);
 
-  const reducer = (accumulator, currentValue) => accumulator + ` &mdash; ` + currentValue;
+  const reducer = (accumulator, currentValue) => `${accumulator  } &mdash; ${  currentValue}`;
 
   const tripRoute = destinationNames.length > 3
     ? `${destinationNames[0]} &mdash; ... &mdash; ${destinationNames[destinationNames.length - 1]}`
     : destinationNames.reduce(reducer);
 
   return tripRoute;
-}
+};
 
 const createDatesTemplate = (points) => {
   const firstPoint = points[0];
@@ -22,7 +22,7 @@ const createDatesTemplate = (points) => {
     : dayjs(lastPoint.dateFrom).format('MMM DD');
 
   return {startDate, endDate};
-}
+};
 
 const createCostValueTemplate = (points) => {
   const reducer = (accumulator, currentValue) => accumulator + currentValue;
@@ -31,8 +31,7 @@ const createCostValueTemplate = (points) => {
   const costValue = prices.reduce(reducer);
 
   return costValue;
-}
-
+};
 
 
 export const createTripInfoTemplate = (points) => {

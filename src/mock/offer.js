@@ -1,4 +1,4 @@
-import { getRandomInteger, shuffle } from "../utils";
+import { getRandomInteger, shuffle } from '../utils';
 
 const offers = [
   {
@@ -103,13 +103,13 @@ const offers = [
 ];
 
 const generateOffers = (type) => {
-  const offerByType = offers.filter((offer) => offer.type === type);
+  const offerByType = offers.filter((item) => item.type === type);
   const [offer] = offerByType;
   const offersByType = offer.offers;
 
   if (offersByType) {
     const copyOfOffersByType = [...offersByType];
-    if (copyOfOffersByType.length > 1) shuffle(copyOfOffersByType);
+    if (copyOfOffersByType.length > 1) {shuffle(copyOfOffersByType);}
     const randomOffersAmount = getRandomInteger(0, offersByType.length);
     const availableOfers = copyOfOffersByType.slice(0, randomOffersAmount);
 

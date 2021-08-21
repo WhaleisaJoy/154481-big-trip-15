@@ -1,16 +1,16 @@
-import { TYPES } from "../const";
-import dayjs from "dayjs";
-import { getRandomInteger } from "../utils";
+import { TYPES } from '../const';
+import dayjs from 'dayjs';
+import { getRandomInteger } from '../utils';
 
 const createTypeTemplate = (point) => {
   const { icon, type } = point;
   const curType = type;
 
-  let typeItems = TYPES.map((type) => `<div
+  const typeItems = TYPES.map((typeItem) => `<div
     class="event__type-item">
-      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type ===  curType ? 'checked' : ''}>
-      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
-    </div>`
+      <input id="event-type-${typeItem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeItem}" ${typeItem ===  curType ? 'checked' : ''}>
+      <label class="event__type-label  event__type-label--${typeItem}" for="event-type-${typeItem}-1">${typeItem}</label>
+    </div>`,
   ).join('');
 
   return `
@@ -27,12 +27,12 @@ const createTypeTemplate = (point) => {
           ${typeItems}
         </fieldset>
       </div>
-    </div>`
-}
+    </div>`;
+};
 
 const createDestinationTemplate = (point) => {
   const { type, destination } = point;
-  const destinationOptions = TYPES.map((type) => `<option value="${type}"></option>`).join('');
+  const destinationOptions = TYPES.map((typeItem) => `<option value="${typeItem}"></option>`).join('');
 
   return `
     <div class="event__field-group  event__field-group--destination">
@@ -43,8 +43,8 @@ const createDestinationTemplate = (point) => {
       <datalist id="destination-list-1">
         ${destinationOptions}
       </datalist>
-    </div>`
-}
+    </div>`;
+};
 
 const createTimeTemplate = (dateFrom, dateTo) => {
   const dateFromValue =  dayjs(dateFrom).format('YY/MM/DD HH:mm');
@@ -56,8 +56,8 @@ const createTimeTemplate = (dateFrom, dateTo) => {
     &mdash;
     <label class="visually-hidden" for="event-end-time-1">To</label>
     <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateToValue}">
-  </div>`
-}
+  </div>`;
+};
 
 const createOffersTemplate = (offers) => {
   const availableOffers = offers.map((offer) => `<div
@@ -76,8 +76,8 @@ const createOffersTemplate = (offers) => {
       <div class="event__available-offers">
         ${availableOffers}
       </div>
-    </section>`
-}
+    </section>`;
+};
 
 const createDestinationDescriptionTemplate = (destination) => {
   const images = destination.pics.map((pic) => `<img class="event__photo" src="${pic}" alt="Event photo">`).join('');
@@ -91,20 +91,19 @@ const createDestinationDescriptionTemplate = (destination) => {
         ${images}
       </div>
     </div>
-  </section>`
-}
-
+  </section>`;
+};
 
 
 export const createEditPointTemplate = (point) => {
-  const { dateFrom, dateTo, icon, type, destination, basePrice, offers, isFavorite } = point;
+  const { dateFrom, dateTo, destination, basePrice, offers } = point;
 
   const typeTemplate = createTypeTemplate(point);
   const destinationTemplate = createDestinationTemplate(point);
 
   const timeTemplate = createTimeTemplate(dateFrom, dateTo);
 
-  const offersTemplate = Boolean(offers.length) ? createOffersTemplate(offers) : '';
+  const offersTemplate = offers.length ? createOffersTemplate(offers) : '';
 
   const isDestination = Boolean(getRandomInteger(0, 1));
   const destinationDescriptionTemplate = isDestination ? createDestinationDescriptionTemplate(destination) : '';
@@ -138,5 +137,5 @@ export const createEditPointTemplate = (point) => {
 
       </section>
     </form>
-  </li>`
+  </li>`;
 };

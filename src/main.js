@@ -11,9 +11,7 @@ const POINTS_COUNT = 15;
 
 const points = new Array(POINTS_COUNT).fill().map(generatePoint);
 
-const sortPoints = (a, b) => {
-  return a.dateFrom - b.dateFrom;
-};
+const sortPoints = (a, b) => a.dateFrom - b.dateFrom;
 const sortedPoints = points.sort(sortPoints);
 
 const render = (container, template, place) => {

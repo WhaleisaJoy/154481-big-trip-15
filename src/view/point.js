@@ -1,4 +1,5 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
+// eslint-disable-next-line no-undef
 const duration = require('dayjs/plugin/duration');
 dayjs.extend(duration);
 
@@ -7,15 +8,15 @@ const createOffersListTemplate = (offers) => {
     <span class="event__offer-title">${offer.name}</span>
     &plus;&euro;&nbsp;
     <span class="event__offer-price">${offer.price}</span>
-  </li>`
+  </li>`,
   ).join('');
 
   return `
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
       ${offersListItems}
-    </ul>`
-}
+    </ul>`;
+};
 
 const getDateDifference = (dateFrom, dateTo) => {
   const dateDuration = dayjs.duration(dayjs(dateTo).diff(dayjs(dateFrom)));
@@ -25,8 +26,7 @@ const getDateDifference = (dateFrom, dateTo) => {
   const dateDurationMinutes = dateDuration.$d.minutes ? `${dateDuration.$d.minutes}M` : '';
 
   return `${dateDurationDays} ${dateDurationHours} ${dateDurationMinutes}`;
-}
-
+};
 
 
 export const createPointTemplate = (point) => {

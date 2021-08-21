@@ -1,4 +1,4 @@
-import { getRandomInteger, shuffle } from "../utils";
+import { getRandomInteger, shuffle } from '../utils';
 
 const generateName = () => {
   const destinations = ['Amsterdam', 'Chamonix', 'Geneva', 'Ankara', 'Moscow', 'Milan', 'Barcelona', 'Beijing', 'Beirut'];
@@ -44,11 +44,8 @@ const generatePics = () => {
 };
 
 
-
-export const generateDestination = () =>  {
-  return {
-    name: generateName(),
-    description: generateDescription(),
-    pics: generatePics(),
-  }
-};
+export const generateDestination = () =>  ({
+  name: generateName(),
+  description: generateDescription(),
+  pics: generatePics(),
+});
