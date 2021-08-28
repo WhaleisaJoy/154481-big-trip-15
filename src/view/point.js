@@ -1,3 +1,4 @@
+import { createElement } from '../utils';
 import dayjs from 'dayjs';
 // eslint-disable-next-line no-undef
 const duration = require('dayjs/plugin/duration');
@@ -29,7 +30,7 @@ const getDateDifference = (dateFrom, dateTo) => {
 };
 
 
-export const createPointTemplate = (point) => {
+const createPointTemplate = (point) => {
   const { dateFrom, dateTo, icon, type, destination, basePrice, offers, isFavorite } = point;
   const favoriteClassName = isFavorite ? 'event__favorite-btn event__favorite-btn--active' : 'event__favorite-btn';
   const offersList = createOffersListTemplate(offers);
@@ -71,3 +72,25 @@ export const createPointTemplate = (point) => {
     </div>
   </li>`;
 };
+
+export default class Point {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._point);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
