@@ -1,3 +1,4 @@
+import { createElement } from '../utils';
 import dayjs from 'dayjs';
 
 const createRouteTemplate = (points) => {
@@ -33,8 +34,7 @@ const createCostValueTemplate = (points) => {
   return costValue;
 };
 
-
-export const createTripInfoTemplate = (points) => {
+const createTripInfoTemplate = (points) => {
   const route = createRouteTemplate(points);
   const dates = createDatesTemplate(points);
   const costValue = createCostValueTemplate(points);
@@ -51,3 +51,26 @@ export const createTripInfoTemplate = (points) => {
     </p>
   </section>`;
 };
+
+export default class TripInfo {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._points);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

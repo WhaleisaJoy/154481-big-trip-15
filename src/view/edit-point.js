@@ -1,14 +1,14 @@
+import { createElement } from '../utils';
 import { TYPES } from '../const';
 import dayjs from 'dayjs';
 import { getRandomInteger } from '../utils';
 
 const createTypeTemplate = (point) => {
   const { icon, type } = point;
-  const curType = type;
 
   const typeItems = TYPES.map((typeItem) => `<div
     class="event__type-item">
-      <input id="event-type-${typeItem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeItem}" ${typeItem ===  curType ? 'checked' : ''}>
+      <input id="event-type-${typeItem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeItem}" ${typeItem ===  type ? 'checked' : ''}>
       <label class="event__type-label  event__type-label--${typeItem}" for="event-type-${typeItem}-1">${typeItem}</label>
     </div>`,
   ).join('');
@@ -95,7 +95,7 @@ const createDestinationDescriptionTemplate = (destination) => {
 };
 
 
-export const createEditPointTemplate = (point) => {
+const createEditPointTemplate = (point) => {
   const { dateFrom, dateTo, destination, basePrice, offers } = point;
 
   const typeTemplate = createTypeTemplate(point);
@@ -139,3 +139,26 @@ export const createEditPointTemplate = (point) => {
     </form>
   </li>`;
 };
+
+export default class EditPoint {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditPointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

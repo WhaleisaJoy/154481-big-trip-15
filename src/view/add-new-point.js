@@ -1,14 +1,14 @@
+import { createElement } from '../utils';
 import { TYPES } from '../const';
 import dayjs from 'dayjs';
 import { getRandomInteger } from '../utils';
 
 const createTypeTemplate = (point) => {
   const { icon, type } = point;
-  const curType = type;
 
   const typeItems = TYPES.map((typeItem) => `<div
     class="event__type-item">
-      <input id="event-type-${typeItem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeItem}" ${typeItem ===  curType ? 'checked' : ''}>
+      <input id="event-type-${typeItem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeItem}" ${typeItem ===  type ? 'checked' : ''}>
       <label class="event__type-label  event__type-label--${typeItem}" for="event-type-${typeItem}-1">${typeItem}</label>
     </div>`,
   ).join('');
@@ -47,14 +47,14 @@ const createDestinationTemplate = (point) => {
 };
 
 const createTimeTemplate = () => {
-  const curDate =  dayjs().format('YY/MM/DD');
+  const currentDate =  dayjs().format('YY/MM/DD');
 
   return `<div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-1">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${curDate} 00:00">
+    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${currentDate} 00:00">
     &mdash;
     <label class="visually-hidden" for="event-end-time-1">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${curDate} 00:00">
+    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${currentDate} 00:00">
   </div>`;
 };
 
@@ -94,7 +94,7 @@ const createDestinationDescriptionTemplate = (destination) => {
 };
 
 
-export const createNewPointTemplate = (point) => {
+const createNewPointTemplate = (point) => {
   const { destination, offers } = point;
 
   const typeTemplate = createTypeTemplate(point);
@@ -134,3 +134,26 @@ export const createNewPointTemplate = (point) => {
       </form>
     </li>`;
 };
+
+export default class NewPoint {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createNewPointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
