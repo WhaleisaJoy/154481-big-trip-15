@@ -1,5 +1,5 @@
 import AbstractView from './abstract';
-import dayjs from 'dayjs';
+import { getTripDates } from '../utils/date';
 
 const createRouteTemplate = (points) => {
   const destinationNames = points.map((point) => point.destination.name);
@@ -13,18 +13,6 @@ const createRouteTemplate = (points) => {
   return tripRoute;
 };
 
-const createDatesTemplate = (points) => {
-  const firstPoint = points[0];
-  const lastPoint = points[points.length - 1];
-
-  const startDate = dayjs(firstPoint.dateFrom).format('MMM DD');
-  const endDate = dayjs(lastPoint.dateFrom).isSame(dayjs(firstPoint.dateFrom), 'month')
-    ? dayjs(lastPoint.dateFrom).format('DD')
-    : dayjs(lastPoint.dateFrom).format('MMM DD');
-
-  return {startDate, endDate};
-};
-
 const createCostValueTemplate = (points) => {
   const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
@@ -36,7 +24,7 @@ const createCostValueTemplate = (points) => {
 
 const createTripInfoTemplate = (points) => {
   const route = createRouteTemplate(points);
-  const dates = createDatesTemplate(points);
+  const dates = getTripDates(points);
   const costValue = createCostValueTemplate(points);
 
   return `<section class="trip-main__trip-info  trip-info">

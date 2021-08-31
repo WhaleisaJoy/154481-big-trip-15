@@ -1,7 +1,7 @@
 import AbstractView from './abstract';
 import { TYPES } from '../const';
 import dayjs from 'dayjs';
-import { getRandomInteger } from '../utils';
+import { getRandomInteger } from '../utils/common';
 
 const createTypeTemplate = (point) => {
   const { icon, type } = point;

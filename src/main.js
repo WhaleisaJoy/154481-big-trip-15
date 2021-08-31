@@ -7,7 +7,7 @@ import PointView from './view/point';
 import EditPointView from './view/edit-point';
 import NoPointView from './view/no-point';
 import { generatePoint } from './mock/point';
-import { RenderPosition, render } from './utils';
+import { RenderPosition, render, replace } from './utils/render';
 
 const POINTS_COUNT = 15;
 
@@ -20,13 +20,8 @@ const renderPoint = (tripEventsListElement, point) => {
   const pointComponent = new PointView(point);
   const EditPointComponent = new EditPointView(point);
 
-  const replacePointToForm = () => {
-    tripEventsListElement.replaceChild(EditPointComponent.getElement(), pointComponent.getElement());
-  };
-
-  const replaceFormToPoint = () => {
-    tripEventsListElement.replaceChild(pointComponent.getElement(), EditPointComponent.getElement());
-  };
+  const replacePointToForm = () => replace(EditPointComponent, pointComponent);
+  const replaceFormToPoint = () => replace(pointComponent, EditPointComponent);
 
   const onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -41,18 +36,17 @@ const renderPoint = (tripEventsListElement, point) => {
     document.addEventListener('keydown', onEscKeyDown);
   };
 
-  const closeEditPointForm = (evt) => {
-    if (evt) {evt.preventDefault();}
+  const closeEditPointForm = () => {
     replaceFormToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
   };
 
-  pointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => openEditPointForm());
+  pointComponent.setClickHandler(openEditPointForm);
 
-  EditPointComponent.getElement().querySelector('.event--edit').addEventListener('submit', (evt) => closeEditPointForm(evt));
-  EditPointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => closeEditPointForm());
+  EditPointComponent.setFormSubmitHandler(closeEditPointForm);
+  EditPointComponent.setClickHandler(closeEditPointForm);
 
-  render(tripEventsListElement, pointComponent.getElement(), RenderPosition.BEFOREEND);
+  render(tripEventsListElement, pointComponent, RenderPosition.BEFOREEND);
 };
 
 const pageHeader = document.querySelector('.page-header');
@@ -63,22 +57,22 @@ const pageMain = document.querySelector('.page-main');
 const tripEvents = pageMain.querySelector('.trip-events');
 
 const renderPageBody = () => {
-  render(tripControlsNavigation, new MenuView().getElement(), RenderPosition.BEFOREEND);
-  render(tripControlsFilter, new FiltersView().getElement(), RenderPosition.BEFOREEND);
+  render(tripControlsNavigation, new MenuView(), RenderPosition.BEFOREEND);
+  render(tripControlsFilter, new FiltersView(), RenderPosition.BEFOREEND);
 
   if (points.length === 0) {
-    render(tripEvents, new NoPointView().getElement(), RenderPosition.BEFOREEND);
+    render(tripEvents, new NoPointView(), RenderPosition.BEFOREEND);
     return;
   }
 
-  render(tripMain, new TripInfoView(sortedPoints).getElement(), RenderPosition.AFTERBEGIN);
-  render(tripEvents, new SortView().getElement(), RenderPosition.BEFOREEND);
+  render(tripMain, new TripInfoView(sortedPoints), RenderPosition.AFTERBEGIN);
+  render(tripEvents, new SortView(), RenderPosition.BEFOREEND);
 
   const tripEventsListComponent = new TripEventsListView();
-  render(tripEvents, tripEventsListComponent.getElement(), RenderPosition.BEFOREEND);
+  render(tripEvents, tripEventsListComponent, RenderPosition.BEFOREEND);
 
   for (let i = 0; i < POINTS_COUNT; i++) {
-    renderPoint(tripEventsListComponent.getElement(), sortedPoints[i]);
+    renderPoint(tripEventsListComponent, sortedPoints[i]);
   }
 };
 
