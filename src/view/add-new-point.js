@@ -1,7 +1,7 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 import { TYPES } from '../const';
 import dayjs from 'dayjs';
-import { getRandomInteger } from '../utils';
+import { getRandomInteger } from '../utils/common';
 
 const createTypeTemplate = (point) => {
   const { icon, type } = point;
@@ -135,25 +135,13 @@ const createNewPointTemplate = (point) => {
     </li>`;
 };
 
-export default class NewPoint {
+export default class NewPoint extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createNewPointTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

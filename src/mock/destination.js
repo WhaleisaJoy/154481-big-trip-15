@@ -1,4 +1,4 @@
-import { getRandomInteger, shuffle } from '../utils';
+import { getRandomInteger, shuffle } from '../utils/common';
 
 const generateName = () => {
   const destinations = ['Amsterdam', 'Chamonix', 'Geneva', 'Ankara', 'Moscow', 'Milan', 'Barcelona', 'Beijing', 'Beirut'];
