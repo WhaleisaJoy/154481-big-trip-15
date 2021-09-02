@@ -1,7 +1,7 @@
 import TripControlsView from './view/trip-controls';
 import MenuView from './view/menu';
 import FiltersView from './view/filters';
-import Trip from './presenter/trip';
+import TripPresenter from './presenter/trip';
 import { generatePoint } from './mock/point';
 import { RenderPosition, render } from './utils/render';
 
@@ -20,5 +20,5 @@ render(tripMain, TripControlsComponent, RenderPosition.AFTERBEGIN);
 render(TripControlsComponent, new MenuView(), RenderPosition.BEFOREEND);
 render(TripControlsComponent, new FiltersView(), RenderPosition.BEFOREEND);
 
-const tripPresenter = new Trip(tripMain, tripEvents, sortedPoints);
+const tripPresenter = new TripPresenter(tripMain, tripEvents, sortedPoints);
 tripPresenter.init();

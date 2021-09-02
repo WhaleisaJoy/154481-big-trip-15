@@ -4,21 +4,30 @@ import TripEventsListView from '../view/trip-events-list';
 import NoPointView from '../view/no-point';
 import PointPresenter from './point';
 import { RenderPosition, render } from '../utils/render';
+import { updateItem } from '../utils/common';
 
 export default class Trip {
   constructor(tripMainContainer, tripEventsContainer, sortedPoints) {
     this._tripMainContainer = tripMainContainer;
     this._tripEventsContainer = tripEventsContainer;
     this._sortedPoints = sortedPoints;
+    this._pointPresenter = new Map();
 
     this._tripInfoComponent = new TripInfoView(this._sortedPoints);
     this._sortComponent = new SortView();
     this._pointListComponent = new TripEventsListView();
     this._noPointComponent = new NoPointView();
+
+    this._handlePointChange = this._handlePointChange.bind(this);
   }
 
   init() {
     this._renderTrip();
+  }
+
+  _handlePointChange(updatedPoint) {
+    this._sortedPoints = updateItem(this._sortedPoints, updatedPoint);
+    this._pointPresenter.get(updatedPoint.id).init(updatedPoint);
   }
 
   _renderTripInfo() {
@@ -44,8 +53,9 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._pointListComponent);
+    const pointPresenter = new PointPresenter(this._pointListComponent, this._handlePointChange);
     pointPresenter.init(point);
+    this._pointPresenter.set(point.id, pointPresenter);
   }
 
   _renderTrip() {

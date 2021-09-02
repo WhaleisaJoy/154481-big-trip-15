@@ -3,6 +3,7 @@ import { generateDestination } from './destination';
 import { generateOffers } from './offer';
 import { TYPES } from '../const';
 import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
 const generateFromDate = () => {
   const maxGap = 60000 * 60 *24 * 7;
@@ -51,6 +52,7 @@ export const generatePoint = () => {
   const dateTo = generateToDate(dateFrom);
 
   return {
+    id: nanoid(),
     dateFrom,
     dateTo,
     icon: `${type}.png`,
