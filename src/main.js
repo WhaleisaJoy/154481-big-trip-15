@@ -21,5 +21,5 @@ render(tripMain, TripControlsComponent, RenderPosition.AFTERBEGIN);
 render(TripControlsComponent, new MenuView(), RenderPosition.BEFOREEND);
 render(TripControlsComponent, new FiltersView(), RenderPosition.BEFOREEND);
 
-const tripPresenter = new TripPresenter(tripMain, tripEvents, sortedPoints);
-tripPresenter.init();
+const tripPresenter = new TripPresenter(tripMain, tripEvents);
+tripPresenter.init(sortedPoints);
