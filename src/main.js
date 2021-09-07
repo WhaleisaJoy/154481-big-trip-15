@@ -5,12 +5,13 @@ import TripPresenter from './presenter/trip';
 import { generatePoint } from './mock/point';
 import { RenderPosition, render } from './utils/render';
 
+import { sortPointsByDay } from './utils/common';
+
 const POINTS_COUNT = 15;
 
 const points = new Array(POINTS_COUNT).fill().map(generatePoint);
 
-const sortPoints = (a, b) => a.dateFrom - b.dateFrom;
-const sortedPoints = points.sort(sortPoints);
+const sortedPoints = points.sort(sortPointsByDay);
 
 const tripMain = document.querySelector('.trip-main');
 const tripEvents = document.querySelector('.trip-events');
@@ -20,5 +21,5 @@ render(tripMain, TripControlsComponent, RenderPosition.AFTERBEGIN);
 render(TripControlsComponent, new MenuView(), RenderPosition.BEFOREEND);
 render(TripControlsComponent, new FiltersView(), RenderPosition.BEFOREEND);
 
-const tripPresenter = new TripPresenter(tripMain, tripEvents, sortedPoints);
-tripPresenter.init();
+const tripPresenter = new TripPresenter(tripMain, tripEvents);
+tripPresenter.init(sortedPoints);
