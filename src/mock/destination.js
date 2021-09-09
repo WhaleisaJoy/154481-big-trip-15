@@ -1,10 +1,10 @@
 import { getRandomInteger, shuffle } from '../utils/common';
+import { DESTINATIONS } from '../const';
 
 const generateName = () => {
-  const destinations = ['Amsterdam', 'Chamonix', 'Geneva', 'Ankara', 'Moscow', 'Milan', 'Barcelona', 'Beijing', 'Beirut'];
-  const randomDestination = getRandomInteger(0, destinations.length - 1);
+  const randomDestination = getRandomInteger(0, DESTINATIONS.length - 1);
 
-  return destinations[randomDestination];
+  return DESTINATIONS[randomDestination];
 };
 
 const generateDescription = () => {
@@ -44,7 +44,7 @@ const generatePics = () => {
 };
 
 
-export const generateDestination = () =>  ({
+export const generateDestination = () => ({
   name: generateName(),
   description: generateDescription(),
   pics: generatePics(),

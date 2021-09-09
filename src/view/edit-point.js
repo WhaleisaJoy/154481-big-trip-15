@@ -1,11 +1,10 @@
-import AbstractView from './abstract';
-import { TYPES } from '../const';
+import SmartView from './smart';
+import { TYPES, DESTINATIONS } from '../const';
 import dayjs from 'dayjs';
-import { getRandomInteger } from '../utils/common';
+import { generateOffers } from '../mock/offer';
+import { generateDestination } from '../mock/destination';
 
-const createTypeTemplate = (point) => {
-  const { icon, type } = point;
-
+const createTypeTemplate = (type) => {
   const typeItems = TYPES.map((typeItem) => `<div
     class="event__type-item">
       <input id="event-type-${typeItem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeItem}" ${typeItem ===  type ? 'checked' : ''}>
@@ -17,7 +16,7 @@ const createTypeTemplate = (point) => {
     <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
         <span class="visually-hidden">Choose event type</span>
-        <img class="event__type-icon" width="17" height="17" src="img/icons/${icon}" alt="Event type icon">
+        <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
       </label>
       <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -30,9 +29,8 @@ const createTypeTemplate = (point) => {
     </div>`;
 };
 
-const createDestinationTemplate = (point) => {
-  const { type, destination } = point;
-  const destinationOptions = TYPES.map((typeItem) => `<option value="${typeItem}"></option>`).join('');
+const createDestinationTemplate = (type, destination) => {
+  const destinationOptions = DESTINATIONS.map((destinationItem) => `<option value="${destinationItem}"></option>`).join('');
 
   return `
     <div class="event__field-group  event__field-group--destination">
@@ -95,17 +93,16 @@ const createDestinationDescriptionTemplate = (destination) => {
 };
 
 
-const createEditPointTemplate = (point) => {
-  const { dateFrom, dateTo, destination, basePrice, offers } = point;
+const createEditPointTemplate = (data) => {
+  const { dateFrom, dateTo, type, destination, basePrice, offers, isOffers, isDestination } = data;
 
-  const typeTemplate = createTypeTemplate(point);
-  const destinationTemplate = createDestinationTemplate(point);
+  const typeTemplate = createTypeTemplate(type);
+  const destinationTemplate = createDestinationTemplate(type, destination);
 
   const timeTemplate = createTimeTemplate(dateFrom, dateTo);
 
-  const offersTemplate = offers.length ? createOffersTemplate(offers) : '';
+  const offersTemplate = isOffers ? createOffersTemplate(offers) : '';
 
-  const isDestination = Boolean(getRandomInteger(0, 1));
   const destinationDescriptionTemplate = isDestination ? createDestinationDescriptionTemplate(destination) : '';
 
   return `<li class="trip-events__item">
@@ -140,16 +137,34 @@ const createEditPointTemplate = (point) => {
   </li>`;
 };
 
-export default class EditPoint extends AbstractView {
-  constructor(point) {
+export default class EditPoint extends SmartView {
+  constructor(data) {
     super();
-    this._point = point;
+    this._data = EditPoint.parsePointToData(data);
     this._clickHandler = this._clickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+
+    this._typeChangeHandler = this._typeChangeHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._priceInputHandler = this._priceInputHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return createEditPointTemplate(this._point);
+    return createEditPointTemplate(this._data);
+  }
+
+  reset(point) {
+    this.updateData(
+      EditPoint.parsePointToData(point),
+    );
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setClickHandler(this._callback.click);
+    this.setFormSubmitHandler(this._callback.formSubmit);
   }
 
   _clickHandler(evt) {
@@ -162,6 +177,70 @@ export default class EditPoint extends AbstractView {
     this._callback.formSubmit();
   }
 
+  _typeChangeHandler(evt) {
+    evt.preventDefault();
+
+    if (evt.target.tagName !== 'INPUT') {
+      return;
+    }
+
+    const type = evt.target.value;
+    const offers = generateOffers(type);
+
+    this.updateData({
+      type,
+      offers,
+      isOffers: offers !== null,
+    });
+  }
+
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+
+    const name = evt.target.value;
+
+    if (DESTINATIONS.includes(name)) {
+      const destination = generateDestination();
+      const description = destination.description;
+      const pics = destination.pics;
+
+      this.updateData({
+        destination: {
+          name,
+          description,
+          pics,
+        },
+      });
+    } else {
+      evt.target.setCustomValidity('Incorrect value');
+      evt.target.reportValidity();
+    }
+  }
+
+  _priceInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      basePrice: evt.target.value,
+    }, true);
+  }
+
+  _setInnerHandlers() {
+    this
+      .getElement()
+      .querySelector('.event__type-list')
+      .addEventListener('input', this._typeChangeHandler);
+
+    this
+      .getElement()
+      .querySelector('.event__input--destination')
+      .addEventListener('change', this._destinationChangeHandler);
+
+    this
+      .getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('input', this._priceInputHandler);
+  }
+
   setClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', callback);
@@ -170,5 +249,16 @@ export default class EditPoint extends AbstractView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('.event--edit').addEventListener('submit', callback);
+  }
+
+  static parsePointToData(point) {
+    return Object.assign(
+      {},
+      point,
+      {
+        isOffers: point.offers !== null,
+        isDestination: point.destination.description,
+      },
+    );
   }
 }
