@@ -9,7 +9,7 @@ const generateFromDate = () => {
   const maxGap = 60000 * 60 *24 * 7;
   const gap = getRandomInteger(-maxGap, maxGap);
 
-  return dayjs().add(gap, 'ms');
+  return dayjs().add(gap, 'ms').toDate();
 };
 
 const generateToDate = (dateFrom) => {
@@ -34,7 +34,7 @@ const generateToDate = (dateFrom) => {
   const randomOption = getRandomInteger(0, durationOptions.length - 1);
   const gap = getRandomInteger(durationOptions[randomOption].minGap, durationOptions[randomOption].maxGap);
 
-  return dayjs(dateFrom).add(gap, 'minute');
+  return dayjs(dateFrom).add(gap, 'minute').toDate();
 };
 
 const generateType = () => {
