@@ -6,7 +6,7 @@ dayjs.extend(duration);
 
 const createOffersListTemplate = (offers) => {
   const offersListItems = offers.map((offer) => `<li class="event__offer">
-    <span class="event__offer-title">${offer.name}</span>
+    <span class="event__offer-title">${offer.title}</span>
     &plus;&euro;&nbsp;
     <span class="event__offer-price">${offer.price}</span>
   </li>`,
@@ -31,9 +31,9 @@ const getDateDifference = (dateFrom, dateTo) => {
 
 
 const createPointTemplate = (point) => {
-  const { dateFrom, dateTo, icon, type, destination, basePrice, offers, isFavorite } = point;
+  const { dateFrom, dateTo, type, destination, basePrice, offers, isFavorite } = point;
   const favoriteClassName = isFavorite ? 'event__favorite-btn event__favorite-btn--active' : 'event__favorite-btn';
-  const offersList = createOffersListTemplate(offers);
+  const offersList = offers !== null ? createOffersListTemplate(offers) : '';
   const date = dayjs(dateFrom).format('MMM D');
   const dateTime = dayjs(dateFrom).format('YYYY-MM-D');
   const dateStartTime = dayjs(dateFrom).format('HH:mm');
@@ -45,7 +45,7 @@ const createPointTemplate = (point) => {
     <div class="event">
       <time class="event__date" datetime="${dateTime}">${date}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${icon}" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${destination.name}</h3>
       <div class="event__schedule">

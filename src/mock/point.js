@@ -55,7 +55,6 @@ export const generatePoint = () => {
     id: nanoid(),
     dateFrom,
     dateTo,
-    icon: `${type}.png`,
     type,
     destination: generateDestination(),
     basePrice: generatePrice(),

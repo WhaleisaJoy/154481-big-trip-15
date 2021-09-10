@@ -103,18 +103,26 @@ const offers = [
 ];
 
 const generateOffers = (type) => {
+  const isOffers = Boolean(getRandomInteger(0, 1));
+
+  if (!isOffers) {
+    return null;
+  }
+
   const offerByType = offers.filter((item) => item.type === type);
   const [offer] = offerByType;
   const offersByType = offer.offers;
 
-  if (offersByType) {
-    const copyOfOffersByType = [...offersByType];
-    if (copyOfOffersByType.length > 1) {shuffle(copyOfOffersByType);}
-    const randomOffersAmount = getRandomInteger(0, offersByType.length);
-    const availableOfers = copyOfOffersByType.slice(0, randomOffersAmount);
-
-    return availableOfers;
+  if (offersByType.length === 0) {
+    return null;
   }
+
+  const copyOfOffersByType = [...offersByType];
+  if (copyOfOffersByType.length > 1) {shuffle(copyOfOffersByType);}
+  const randomOffersAmount = getRandomInteger(1, offersByType.length);
+  const availableOfers = copyOfOffersByType.slice(0, randomOffersAmount);
+
+  return availableOfers;
 };
 
 export { generateOffers };
