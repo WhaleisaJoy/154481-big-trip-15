@@ -146,8 +146,9 @@ export default class EditPoint extends SmartView {
     this._startDatePicker = null;
     this._endDatePicker = null;
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._closeEditFormHandler = this._closeEditFormHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
 
     this._typeChangeHandler = this._typeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
@@ -163,6 +164,12 @@ export default class EditPoint extends SmartView {
     return createEditPointTemplate(this._data);
   }
 
+  removeElement() {
+    super.removeElement();
+
+    this._destroyDatePicker();
+  }
+
   reset(point) {
     this.updateData(
       EditPoint.parsePointToData(point),
@@ -171,18 +178,14 @@ export default class EditPoint extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this.setClickHandler(this._callback.click);
+    this.setCloseEditFormHandler(this._callback.closeEditForm);
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this._setDatePicker();
   }
 
   _setDatePicker() {
-    if (this._startDatePicker || this._endDatePicker) {
-      this._startDatePicker.destroy();
-      this._endDatePicker.destroy();
-      this._startDatePicker = null;
-      this._endDatePicker = null;
-    }
+    this._destroyDatePicker();
 
     const startDate = this.getElement().querySelector('#event-start-time-1');
     const endDate = this.getElement().querySelector('#event-end-time-1');
@@ -213,14 +216,13 @@ export default class EditPoint extends SmartView {
     );
   }
 
-  _clickHandler(evt) {
-    evt.preventDefault();
-    this._callback.click();
-  }
-
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-    this._callback.formSubmit(EditPoint.parsePointToData(this._data));
+  _destroyDatePicker() {
+    if (this._startDatePicker || this._endDatePicker) {
+      this._startDatePicker.destroy();
+      this._endDatePicker.destroy();
+      this._startDatePicker = null;
+      this._endDatePicker = null;
+    }
   }
 
   _typeChangeHandler(evt) {
@@ -305,14 +307,34 @@ export default class EditPoint extends SmartView {
       .addEventListener('input', this._priceInputHandler);
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', callback);
+  _closeEditFormHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeEditForm();
+  }
+
+  setCloseEditFormHandler(callback) {
+    this._callback.closeEditForm = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._closeEditFormHandler);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit(EditPoint.parseDataToPoint(this._data));
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    this.getElement().querySelector('.event--edit').addEventListener('submit', callback);
+    this.getElement().querySelector('.event--edit').addEventListener('submit', this._formSubmitHandler);
+  }
+
+  _deleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EditPoint.parseDataToPoint(this._data));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deleteClickHandler);
   }
 
   static parsePointToData(point) {
@@ -324,5 +346,22 @@ export default class EditPoint extends SmartView {
         isDestination: point.destination.description,
       },
     );
+  }
+
+  static parseDataToPoint(data) {
+    data = Object.assign({}, data);
+
+    if (!data.isOffers) {
+      data.offers = null;
+    }
+
+    if (!data.isDestination) {
+      data.destination.description = null;
+    }
+
+    delete data.isOffers;
+    delete data.isDestination;
+
+    return data;
   }
 }
