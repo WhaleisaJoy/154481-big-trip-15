@@ -117,7 +117,7 @@ export default class Trip {
   }
 
   _renderTripInfo() {
-    this._tripInfoComponent = new TripInfoView(this._getPoints());
+    this._tripInfoComponent = new TripInfoView(this._getPoints().slice().sort(sortPointsByDay));
     render(this._tripMainContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
   }
 

@@ -1,23 +1,34 @@
 import SmartView from './smart';
-import dayjs from 'dayjs';
-import flatpickr from 'flatpickr';
-import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import { TYPES, DESTINATIONS } from '../const';
 import { generateOffers } from '../mock/offer';
 import { generateDestination } from '../mock/destination';
+import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import he from 'he';
+
 
 const EMPTY_POINT = {
   dateFrom: dayjs().toDate(),
   dateTo: dayjs().toDate(),
   type: TYPES[0],
   destination: {
-    name: DESTINATIONS[0],
-    description: null,
-    pics: null,
+    name: '',
+    description: '',
+    pics: '',
   },
   basePrice: '',
   offers: null,
   isFavorite: false,
+};
+
+const DATEPICKER_CONFIG = {
+  defaultDate: null,
+  dateFormat: 'y/m/d H:i',
+  enableTime: true,
+  // eslint-disable-next-line camelcase
+  time_24hr: true,
+  onChange: null,
 };
 
 const createTypeTemplate = (type) => {
@@ -53,7 +64,7 @@ const createDestinationTemplate = (type, destination) => {
       <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
       <datalist id="destination-list-1">
         ${destinationOptions}
       </datalist>
@@ -134,7 +145,7 @@ const createEditPointTemplate = (data) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -206,27 +217,27 @@ export default class EditPoint extends SmartView {
 
     this._startDatePicker = flatpickr(
       startDate,
-      {
-        defaultDate: this._data.dateFrom,
-        dateFormat: 'y/m/d H:i',
-        enableTime: true,
-        // eslint-disable-next-line camelcase
-        time_24hr: true,
-        onChange: this._startDateChangeHandler,
-      },
+      Object.assign(
+        {},
+        DATEPICKER_CONFIG,
+        {
+          defaultDate: this._data.dateFrom,
+          onChange: this._startDateChangeHandler,
+        },
+      ),
     );
 
     this._endDatePicker = flatpickr(
       endDate,
-      {
-        defaultDate: this._data.dateTo,
-        dateFormat: 'y/m/d H:i',
-        enableTime: true,
-        // eslint-disable-next-line camelcase
-        time_24hr: true,
-        minDate: this._data.dateFrom,
-        onChange: this._endDateChangeHandler,
-      },
+      Object.assign(
+        {},
+        DATEPICKER_CONFIG,
+        {
+          defaultDate: this._data.dateTo,
+          minDate: this._data.dateFrom,
+          onChange: this._endDateChangeHandler,
+        },
+      ),
     );
   }
 
