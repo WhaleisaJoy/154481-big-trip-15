@@ -6,6 +6,20 @@ import { TYPES, DESTINATIONS } from '../const';
 import { generateOffers } from '../mock/offer';
 import { generateDestination } from '../mock/destination';
 
+const EMPTY_POINT = {
+  dateFrom: dayjs().toDate(),
+  dateTo: dayjs().toDate(),
+  type: TYPES[0],
+  destination: {
+    name: DESTINATIONS[0],
+    description: null,
+    pics: null,
+  },
+  basePrice: '',
+  offers: null,
+  isFavorite: false,
+};
+
 const createTypeTemplate = (type) => {
   const typeItems = TYPES.map((typeItem) => `<div
     class="event__type-item">
@@ -140,9 +154,9 @@ const createEditPointTemplate = (data) => {
 };
 
 export default class EditPoint extends SmartView {
-  constructor(data) {
+  constructor(point = EMPTY_POINT) {
     super();
-    this._data = EditPoint.parsePointToData(data);
+    this._data = EditPoint.parsePointToData(point);
     this._startDatePicker = null;
     this._endDatePicker = null;
 

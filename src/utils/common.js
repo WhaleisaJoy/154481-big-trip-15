@@ -16,20 +16,6 @@ export const shuffle = (array) => {
   }
 };
 
-// export const updateItem = (items, update) => {
-//   const index = items.findIndex((item) => item.id === update.id);
-
-//   if (index === -1) {
-//     return items;
-//   }
-
-//   return [
-//     ...items.slice(0, index),
-//     update,
-//     ...items.slice(index + 1),
-//   ];
-// };
-
 export const sortPointsByDay = (a, b) => a.dateFrom - b.dateFrom;
 
 export const sortPointsByTime = (a, b) => dayjs(b.dateTo).diff(dayjs(b.dateFrom)) - dayjs(a.dateTo).diff(dayjs(a.dateFrom));

@@ -32,3 +32,8 @@ const filterPresenter = new FilterPresenter(TripControlsComponent, filterModel, 
 
 tripPresenter.init();
 filterPresenter.init();
+
+tripMain.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+  evt.preventDefault();
+  tripPresenter.createNewPoint();
+});
