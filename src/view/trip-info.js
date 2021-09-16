@@ -16,7 +16,7 @@ const createRouteTemplate = (points) => {
 const createCostValueTemplate = (points) => {
   const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
-  const prices = points.map((point) => point.basePrice);
+  const prices = points.map((point) => +point.basePrice);
   const costValue = prices.reduce(reducer);
 
   return costValue;
