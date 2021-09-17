@@ -20,6 +20,7 @@ export default class Trip {
     this._activeFilterType = FilterType.EVERYTHING;
     this._currentSortType = SortType.DAY;
 
+    this._tripInfoComponent = null;
     this._sortComponent = null;
     this._noPointComponent = null;
 
@@ -30,16 +31,25 @@ export default class Trip {
     this._handlePointModeChange = this._handlePointModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
-    this._pointsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-
     this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction);
   }
 
   init() {
     this._points = this._getPoints().slice();
 
+    this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
     this._renderTrip();
+  }
+
+  destroy() {
+    this._clearTrip({resetTripInfo: false, resetSortType: true});
+
+    remove(this._pointListComponent);
+
+    this._pointsModel.deleteObserver(this._handleModelEvent);
+    this._filterModel.deleteObserver(this._handleModelEvent);
   }
 
   createNewPoint() {
@@ -158,16 +168,22 @@ export default class Trip {
       return;
     }
 
-    this._renderTripInfo();
+    if (this._tripInfoComponent === null) {
+      this._renderTripInfo();
+    }
+
     this._renderSort();
     this._renderPointList();
     this._renderPoints();
   }
 
-  _clearTrip({resetSortType = false} = {}) {
+  _clearTrip({resetTripInfo = true, resetSortType = false} = {}) {
     this._clearPointList();
 
-    remove(this._tripInfoComponent);
+    if (resetTripInfo) {
+      remove(this._tripInfoComponent);
+      this._tripInfoComponent = null;
+    }
     remove(this._sortComponent);
 
     if (this._noPointComponent) {
