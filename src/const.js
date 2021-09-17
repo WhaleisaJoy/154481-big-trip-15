@@ -2,6 +2,11 @@ export const TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-
 
 export const DESTINATIONS = ['Amsterdam', 'Chamonix', 'Geneva', 'Ankara', 'Moscow', 'Milan', 'Barcelona', 'Beijing', 'Beirut'];
 
+export const MenuItem = {
+  TABLE: 'Table',
+  STATS: 'Stats',
+};
+
 export const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
