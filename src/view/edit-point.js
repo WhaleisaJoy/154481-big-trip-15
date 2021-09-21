@@ -105,7 +105,7 @@ const createOffersTemplate = (offers) => {
 };
 
 const createDestinationDescriptionTemplate = (destination) => {
-  const images = destination.pics.map((pic) => `<img class="event__photo" src="${pic}" alt="Event photo">`).join('');
+  const images = destination.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('');
 
   return `<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -123,12 +123,16 @@ const createDestinationDescriptionTemplate = (destination) => {
 const createEditPointTemplate = (data) => {
   const { dateFrom, dateTo, type, destination, basePrice, offers, isOffers, isDestination } = data;
 
+  // console.log(data);
+
   const typeTemplate = createTypeTemplate(type);
   const destinationTemplate = createDestinationTemplate(type, destination);
 
   const timeTemplate = createTimeTemplate(dateFrom, dateTo);
 
   const offersTemplate = isOffers ? createOffersTemplate(offers) : '';
+
+  // console.log(isDestination);
 
   const destinationDescriptionTemplate = isDestination ? createDestinationDescriptionTemplate(destination) : '';
 
@@ -363,12 +367,13 @@ export default class EditPoint extends SmartView {
   }
 
   static parsePointToData(point) {
+    // console.log(point.destination.description.length);
     return Object.assign(
       {},
       point,
       {
         isOffers: point.offers !== null,
-        isDestination: point.destination.description,
+        isDestination: point.destination.description !== null,
       },
     );
   }
