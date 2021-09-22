@@ -1,17 +1,17 @@
 import TripControlsView from './view/trip-controls';
 import MenuView from './view/menu';
+import PointNewButtonView from './view/point-new-button';
 import StatisticsView from './view/statistics';
 import TripPresenter from './presenter/trip';
 import FilterPresenter from './presenter/filter';
 import PointsModel from './model/points';
+import OffersModel from './model/offers';
+import DestinationsModel from './model/destinations';
 import FilterModel from './model/filter';
-// import { generatePoint } from './mock/point';
 import { RenderPosition, render, remove } from './utils/render';
-// import { sortPointsByDay } from './utils/common';
-import { MenuItem, UpdateType } from './const';
+import { MenuItem, UpdateType, FilterType } from './const';
 import Api from './api';
 
-// const POINTS_COUNT = 15;
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 const AUTHORIZATION = 'Basic mn7fo4heYndp9du6b';
 
@@ -19,26 +19,21 @@ const tripMain = document.querySelector('.trip-main');
 const pageMainBodyContainer = document.querySelector('.page-main .page-body__container');
 const tripEvents = document.querySelector('.trip-events');
 
-// const points = new Array(POINTS_COUNT).fill().map(generatePoint);
-// const sortedPoints = points.sort(sortPointsByDay);
 const api = new Api(END_POINT, AUTHORIZATION);
 
-// api.getPoints().then((points) => {
-//   console.log(points);
-// });
-
 const pointsModel = new PointsModel();
-// pointsModel.setPoints(sortedPoints);
-
 const filterModel = new FilterModel();
-
+const offersModel = new OffersModel();
+const destinationsModel = new DestinationsModel();
 
 const TripControlsComponent = new TripControlsView();
-const SiteMenuComponent = new MenuView();
-render(tripMain, TripControlsComponent, RenderPosition.AFTERBEGIN);
-render(TripControlsComponent, SiteMenuComponent, RenderPosition.BEFOREEND);
+const siteMenuComponent = new MenuView();
+const pointNewButtonComponent = new PointNewButtonView();
 
-const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, api);
+render(tripMain, TripControlsComponent, RenderPosition.AFTERBEGIN);
+render(TripControlsComponent, siteMenuComponent, RenderPosition.BEFOREEND);
+
+const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, offersModel, destinationsModel, api);
 const filterPresenter = new FilterPresenter(TripControlsComponent, filterModel, pointsModel);
 
 let statisticsComponent = null;
@@ -47,34 +42,52 @@ const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
       remove(statisticsComponent);
-      SiteMenuComponent.setMenuItem(menuItem);
+      siteMenuComponent.setMenuItem(menuItem);
+      filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       tripPresenter.init();
       break;
     case MenuItem.STATS:
       tripPresenter.destroy();
-      SiteMenuComponent.setMenuItem(menuItem);
+      siteMenuComponent.setMenuItem(menuItem);
       statisticsComponent = new StatisticsView(pointsModel.getPoints());
+      filterPresenter.disable();
       render(pageMainBodyContainer, statisticsComponent, RenderPosition.BEFOREEND);
       break;
   }
 };
 
-SiteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+const handlePointNewButtonClick = () => {
+  const isStatisticsOpened = pageMainBodyContainer.querySelector('.statistics');
+
+  if (isStatisticsOpened) {
+    remove(statisticsComponent);
+    siteMenuComponent.setMenuItem(MenuItem.TABLE);
+    tripPresenter.init();
+  }
+
+  tripPresenter.createNewPoint();
+};
+
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+pointNewButtonComponent.setNewPointClickHandler(handlePointNewButtonClick);
 
 tripPresenter.init();
 filterPresenter.init();
 
-tripMain.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
-  evt.preventDefault();
-  tripPresenter.createNewPoint();
-});
-
-api.getPoints()
-  .then((points) => {
-    //console.log(points);
-    // console.log('setPoints');
+Promise.all([
+  api.getOffers(),
+  api.getDestinations(),
+  api.getPoints(),
+])
+  .then( ([offers, destinations, points]) => {
+    offersModel.setOffers(offers);
+    destinationsModel.setDestinations(destinations);
     pointsModel.setPoints(UpdateType.INIT, points);
+    render(tripMain, pointNewButtonComponent, RenderPosition.BEFOREEND);
   })
   .catch(() => {
+    offersModel.setOffers([]);
+    destinationsModel.setDestinations([]);
     pointsModel.setPoints(UpdateType.INIT, []);
   });
+

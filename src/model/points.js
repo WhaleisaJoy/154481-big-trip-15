@@ -61,8 +61,6 @@ export default class Points extends AbstractObserver {
       {},
       point,
       {
-        // dateFrom: point['date_from'],
-        // dateTo: point['date_to'],
         dateFrom: point.date_from !== null ? new Date(point.date_from) : point.date_from,
         dateTo: point.date_to !== null ? new Date(point.date_to) : point.date_to,
         basePrice: point['base_price'],
@@ -83,8 +81,6 @@ export default class Points extends AbstractObserver {
       {},
       point,
       {
-        // 'date_from': point.dateFrom,
-        // 'date_to': point.dateTo,
         'date_from': point.dateFrom instanceof Date ? point.dateFrom.toISOString() : null,
         'date_to': point.dateTo instanceof Date ? point.dateTo.toISOString() : null,
         'base_price': point.basePrice,

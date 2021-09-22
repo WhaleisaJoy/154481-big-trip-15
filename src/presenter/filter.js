@@ -34,6 +34,11 @@ export default class Filter {
     remove(prevFilterComponent);
   }
 
+  disable() {
+    const filterOptions = this._filterComponent.getElement().querySelectorAll('.trip-filters__filter-input');
+    filterOptions.forEach((option) => option.disabled = true);
+  }
+
   _getFilters() {
     const points = this._pointsModel.getPoints();
 
