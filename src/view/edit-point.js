@@ -1,26 +1,10 @@
 import SmartView from './smart';
-import { TYPES, DESTINATIONS } from '../const';
-import { generateOffers } from '../mock/offer';
-import { generateDestination } from '../mock/destination';
+import { TYPES } from '../const';
+import { replaceString } from '../utils/common';
 import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import he from 'he';
-
-
-const EMPTY_POINT = {
-  dateFrom: dayjs().toDate(),
-  dateTo: dayjs().toDate(),
-  type: TYPES[0],
-  destination: {
-    name: '',
-    description: '',
-    pics: '',
-  },
-  basePrice: '',
-  offers: null,
-  isFavorite: false,
-};
 
 const DATEPICKER_CONFIG = {
   defaultDate: null,
@@ -31,7 +15,7 @@ const DATEPICKER_CONFIG = {
   onChange: null,
 };
 
-const createTypeTemplate = (type) => {
+const createTypeTemplate = (type, isDisabled) => {
   const typeItems = TYPES.map((typeItem) => `<div
     class="event__type-item">
       <input id="event-type-${typeItem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeItem}" ${typeItem ===  type ? 'checked' : ''}>
@@ -45,7 +29,7 @@ const createTypeTemplate = (type) => {
         <span class="visually-hidden">Choose event type</span>
         <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
       </label>
-      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
       <div class="event__type-list">
         <fieldset class="event__type-group">
@@ -56,44 +40,80 @@ const createTypeTemplate = (type) => {
     </div>`;
 };
 
-const createDestinationTemplate = (type, destination) => {
-  const destinationOptions = DESTINATIONS.map((destinationItem) => `<option value="${destinationItem}"></option>`).join('');
+const createDestinationTemplate = (type, destination, destinationsData, isDisabled) => {
+  const destinationOptions = [...destinationsData.keys()].map((destinationData) => `<option value="${destinationData}"></option>`).join('');
 
   return `
     <div class="event__field-group  event__field-group--destination">
       <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
+      <input
+      class="event__input  event__input--destination"
+      id="event-destination-1"
+      type="text"
+      name="event-destination"
+      value="${he.encode(destination.name)}"
+      list="destination-list-1"
+      ${isDisabled ? 'disabled' : ''}>
       <datalist id="destination-list-1">
         ${destinationOptions}
       </datalist>
     </div>`;
 };
 
-const createTimeTemplate = (dateFrom, dateTo) => {
+const createTimeTemplate = (dateFrom, dateTo, isDisabled) => {
   const dateFromValue =  dayjs(dateFrom).format('YY/MM/DD HH:mm');
   const dateToValue =  dayjs(dateTo).format('YY/MM/DD HH:mm');
 
   return `<div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-1">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFromValue}">
+
+    <input
+    class="event__input  event__input--time"
+    id="event-start-time-1"
+    type="text"
+    name="event-start-time"
+    value="${dateFromValue}"
+    ${isDisabled ? 'disabled' : ''}>
+
     &mdash;
+
     <label class="visually-hidden" for="event-end-time-1">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateToValue}">
+
+    <input
+    class="event__input  event__input--time"
+    id="event-end-time-1"
+    type="text"
+    name="event-end-time"
+    value="${dateToValue}"
+    ${isDisabled ? 'disabled' : ''}>
   </div>`;
 };
 
-const createOffersTemplate = (offers) => {
-  const availableOffers = offers.map((offer) => `<div
+const createOffersTemplate = (offers, offersData, isDisabled) => {
+  const availableOffers = offersData.map((offerData) => {
+    const selectedOffersTitles = offers && offers.map((offer) => offer.title);
+    const isOfferChecked = selectedOffersTitles && selectedOffersTitles.includes(offerData.title);
+
+    const offerName = replaceString(offerData.title.toLowerCase());
+
+    return `<div
     class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name}-1" type="checkbox" name="event-offer-${offer.name}" checked>
-      <label class="event__offer-label" for="event-offer-${offer.name}-1">
-        <span class="event__offer-title">${offer.title}</span>
+      <input
+      class="event__offer-checkbox  visually-hidden"
+      id="event-offer-${offerName}-1"
+      type="checkbox"
+      name="event-offer-${offerName}"
+      ${isOfferChecked ? 'checked' : ''}
+      ${isDisabled ? 'disabled' : ''}>
+      <label class="event__offer-label" for="event-offer-${offerName}-1">
+        <span class="event__offer-title">${offerData.title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
+        <span class="event__offer-price">${offerData.price}</span>
       </label>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   return `<section
     class="event__section  event__section--offers">
@@ -105,7 +125,7 @@ const createOffersTemplate = (offers) => {
 };
 
 const createDestinationDescriptionTemplate = (destination) => {
-  const images = destination.pics.map((pic) => `<img class="event__photo" src="${pic}" alt="Event photo">`).join('');
+  const pictures = destination.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('');
 
   return `<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -113,24 +133,32 @@ const createDestinationDescriptionTemplate = (destination) => {
 
     <div class="event__photos-container">
       <div class="event__photos-tape">
-        ${images}
+        ${pictures}
       </div>
     </div>
   </section>`;
 };
 
 
-const createEditPointTemplate = (data) => {
-  const { dateFrom, dateTo, type, destination, basePrice, offers, isOffers, isDestination } = data;
+const createEditPointTemplate = (data, offersData, destinationsData) => {
+  const { dateFrom, dateTo, type, destination, basePrice, offers, isDestination, isNew, isDisabled, isSaving, isDeleting } = data;
 
-  const typeTemplate = createTypeTemplate(type);
-  const destinationTemplate = createDestinationTemplate(type, destination);
+  const typeTemplate = createTypeTemplate(type, isDisabled);
+  const destinationTemplate = createDestinationTemplate(type, destination, destinationsData, isDisabled);
+  const timeTemplate = createTimeTemplate(dateFrom, dateTo, isDisabled);
 
-  const timeTemplate = createTimeTemplate(dateFrom, dateTo);
-
-  const offersTemplate = isOffers ? createOffersTemplate(offers) : '';
+  const availableOffers = offersData.get(type).offers;
+  const offersTemplate = offersData && offersData.size ? createOffersTemplate(offers, availableOffers, isDisabled) : '';
 
   const destinationDescriptionTemplate = isDestination ? createDestinationDescriptionTemplate(destination) : '';
+
+  let resetButtonText = 'Delete';
+
+  if (isNew) {
+    resetButtonText = 'Cancel';
+  } else if (isDeleting) {
+    resetButtonText = 'Deleting';
+  }
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -145,14 +173,27 @@ const createEditPointTemplate = (data) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
+          <input
+          class="event__input  event__input--price"
+          id="event-price-1"
+          type="number"
+          name="event-price"
+          value="${basePrice}"
+          ${isDisabled ? 'disabled' : ''}>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
+        <button class="event__save-btn  btn  btn--blue" type="submit">
+          ${isSaving ? 'Saving...' : 'Save'}
         </button>
+
+        <button class="event__reset-btn" type="reset">
+          ${resetButtonText}
+        </button>
+
+        ${isNew ? '' : `<button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>`}
+
       </header>
       <section class="event__details">
 
@@ -165,9 +206,11 @@ const createEditPointTemplate = (data) => {
 };
 
 export default class EditPoint extends SmartView {
-  constructor(point = EMPTY_POINT) {
+  constructor(point, offers, destinations) {
     super();
     this._data = EditPoint.parsePointToData(point);
+    this._offersData = offers;
+    this._destinationsData = destinations;
     this._startDatePicker = null;
     this._endDatePicker = null;
 
@@ -180,13 +223,14 @@ export default class EditPoint extends SmartView {
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
+    this._offersChangeHandler = this._offersChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatePicker();
   }
 
   getTemplate() {
-    return createEditPointTemplate(this._data);
+    return createEditPointTemplate(this._data, this._offersData, this._destinationsData);
   }
 
   removeElement() {
@@ -203,7 +247,11 @@ export default class EditPoint extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this.setCloseEditFormHandler(this._callback.closeEditForm);
+
+    if (!this._data.isNew) {
+      this.setCloseEditFormHandler(this._callback.closeEditForm);
+    }
+
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
     this._setDatePicker();
@@ -258,12 +306,12 @@ export default class EditPoint extends SmartView {
     }
 
     const type = evt.target.value;
-    const offers = generateOffers(type);
+    const offers = this._offersData.get(type).offers;
 
     this.updateData({
       type,
       offers,
-      isOffers: offers !== null,
+      isOffers: offers.length > 0,
     });
   }
 
@@ -271,18 +319,20 @@ export default class EditPoint extends SmartView {
     evt.preventDefault();
 
     const name = evt.target.value;
+    const destinationNames = [...this._destinationsData.keys()];
 
-    if (DESTINATIONS.includes(name)) {
-      const destination = generateDestination();
+    if (destinationNames.includes(name)) {
+      const destination = this._destinationsData.get(name);
       const description = destination.description;
-      const pics = destination.pics;
+      const pictures = destination.pictures;
 
       this.updateData({
         destination: {
           name,
           description,
-          pics,
+          pictures,
         },
+        isDestination: description.length > 0,
       });
     } else {
       evt.target.setCustomValidity('Incorrect value');
@@ -311,8 +361,37 @@ export default class EditPoint extends SmartView {
   _priceInputHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      basePrice: evt.target.value,
+      basePrice: parseInt(evt.target.value, 10),
     }, true);
+  }
+
+  _offersChangeHandler(evt) {
+    evt.preventDefault();
+
+    const parent = evt.target.closest('.event__offer-selector');
+    const choosenOfferType = this._data.type;
+    const choosenOfferTitle = parent.querySelector('.event__offer-title').innerText;
+    const isChecked = evt.target.checked;
+
+    const availableOffers = this._offersData.get(choosenOfferType).offers;
+
+    const choosenOffer = availableOffers.find((offer) => offer.title === choosenOfferTitle);
+
+    if (!this._data.offers) {
+      this._data.offers = [];
+    }
+
+    const currentOffers = this._data.offers.slice();
+
+    if (isChecked) {
+      this._data.offers.push(choosenOffer);
+    } else {
+      this._data.offers = currentOffers.filter((offer) => offer.title !== choosenOfferTitle);
+    }
+
+    this.updateData({
+      offers: this._data.offers.slice(),
+    });
   }
 
   _setInnerHandlers() {
@@ -330,6 +409,13 @@ export default class EditPoint extends SmartView {
       .getElement()
       .querySelector('.event__input--price')
       .addEventListener('input', this._priceInputHandler);
+
+    if (this._offersData && this._offersData.size) {
+      this
+        .getElement()
+        .querySelector('.event__available-offers')
+        .addEventListener('change', this._offersChangeHandler);
+    }
   }
 
   _closeEditFormHandler(evt) {
@@ -367,8 +453,12 @@ export default class EditPoint extends SmartView {
       {},
       point,
       {
-        isOffers: point.offers !== null,
-        isDestination: point.destination.description,
+        isOffers: point.offers.length > 0,
+        isDestination: point.destination.description !== null,
+        isNew: !point.id,
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
       },
     );
   }
@@ -377,7 +467,7 @@ export default class EditPoint extends SmartView {
     data = Object.assign({}, data);
 
     if (!data.isOffers) {
-      data.offers = null;
+      data.offers = [];
     }
 
     if (!data.isDestination) {
@@ -386,6 +476,10 @@ export default class EditPoint extends SmartView {
 
     delete data.isOffers;
     delete data.isDestination;
+    delete data.isNew;
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
 
     return data;
   }

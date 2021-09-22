@@ -32,13 +32,13 @@ const getDateDifference = (dateFrom, dateTo) => {
 
 const createPointTemplate = (point) => {
   const { dateFrom, dateTo, type, destination, basePrice, offers, isFavorite } = point;
+
   const favoriteClassName = isFavorite ? 'event__favorite-btn event__favorite-btn--active' : 'event__favorite-btn';
   const offersList = offers !== null ? createOffersListTemplate(offers) : '';
   const date = dayjs(dateFrom).format('MMM D');
   const dateTime = dayjs(dateFrom).format('YYYY-MM-D');
   const dateStartTime = dayjs(dateFrom).format('HH:mm');
   const dateEndTime = dayjs(dateTo).format('HH:mm');
-
   const eventDuration = getDateDifference(dateFrom, dateTo);
 
   return `<li class="trip-events__item">

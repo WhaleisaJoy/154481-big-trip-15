@@ -31,8 +31,6 @@ export default class Menu extends AbstractView {
 
   _menuClickHandler(evt) {
     evt.preventDefault();
-    //console.log(this.getElement().querySelector('.trip-tabs').children.forEach((child) => console.log(child)));
-    //console.log(evt.target.classList.add('trip-tabs__btn--active'));
     this._callback.menuClick(evt.target.dataset.menuItem);
   }
 
