@@ -11,14 +11,14 @@ import { SortType, UserActionType, UpdateType, FilterType } from '../const';
 import { filter } from '../utils/filter';
 
 export default class Trip {
-  constructor(tripMainContainer, tripEventsContainer, pointsModel, filterModel, offersModel, destinationsModel, api) {
+  constructor(tripMainContainerElement, tripEventsContainerElement, pointsModel, filterModel, offersModel, destinationsModel, api) {
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
 
-    this._tripMainContainer = tripMainContainer;
-    this._tripEventsContainer = tripEventsContainer;
+    this._tripMainContainerElement = tripMainContainerElement;
+    this._tripEventsContainerElement = tripEventsContainerElement;
     this._pointPresenter = new Map();
     this._activeFilterType = FilterType.EVERYTHING;
     this._currentSortType = SortType.DAY;
@@ -162,7 +162,7 @@ export default class Trip {
 
   _renderTripInfo() {
     this._tripInfoComponent = new TripInfoView(this._getPoints().slice().sort(sortPointsByDay));
-    render(this._tripMainContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
+    render(this._tripMainContainerElement, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderSort() {
@@ -172,20 +172,20 @@ export default class Trip {
 
     this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
-    render(this._tripEventsContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    render(this._tripEventsContainerElement, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
   _renderLoading() {
-    render(this._tripEventsContainer, this._loadingComponent, RenderPosition.BEFOREEND);
+    render(this._tripEventsContainerElement, this._loadingComponent, RenderPosition.BEFOREEND);
   }
 
   _renderNoPoint() {
     this._noPointComponent = new NoPointView(this._activeFilterType);
-    render(this._tripEventsContainer, this._noPointComponent, RenderPosition.BEFOREEND);
+    render(this._tripEventsContainerElement, this._noPointComponent, RenderPosition.BEFOREEND);
   }
 
   _renderPointList() {
-    render(this._tripEventsContainer, this._pointListComponent, RenderPosition.BEFOREEND);
+    render(this._tripEventsContainerElement, this._pointListComponent, RenderPosition.BEFOREEND);
   }
 
   _renderPoints() {

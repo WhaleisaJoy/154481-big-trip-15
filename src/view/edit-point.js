@@ -7,12 +7,11 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import he from 'he';
 
 const DATEPICKER_CONFIG = {
-  defaultDate: null,
-  dateFormat: 'y/m/d H:i',
-  enableTime: true,
-  // eslint-disable-next-line camelcase
-  time_24hr: true,
-  onChange: null,
+  'defaultDate': null,
+  'dateFormat': 'y/m/d H:i',
+  'enableTime': true,
+  'time_24hr': true,
+  'onChange': null,
 };
 
 const createTypeTemplate = (type, isDisabled) => {
@@ -91,12 +90,12 @@ const createTimeTemplate = (dateFrom, dateTo, isDisabled) => {
   </div>`;
 };
 
-const createOffersTemplate = (offers, offersData, isDisabled) => {
-  const availableOffers = offersData.map((offerData) => {
-    const selectedOffersTitles = offers && offers.map((offer) => offer.title);
-    const isOfferChecked = selectedOffersTitles && selectedOffersTitles.includes(offerData.title);
+const createOffersTemplate = (selectedOffers, availableOffers, isDisabled) => {
+  const offers = availableOffers.map((availableOffer) => {
+    const selectedOffersTitles = selectedOffers && selectedOffers.map((offer) => offer.title);
+    const isOfferChecked = selectedOffersTitles && selectedOffersTitles.includes(availableOffer.title);
 
-    const offerName = replaceString(offerData.title.toLowerCase());
+    const offerName = replaceString(availableOffer.title.toLowerCase());
 
     return `<div
     class="event__offer-selector">
@@ -108,9 +107,9 @@ const createOffersTemplate = (offers, offersData, isDisabled) => {
       ${isOfferChecked ? 'checked' : ''}
       ${isDisabled ? 'disabled' : ''}>
       <label class="event__offer-label" for="event-offer-${offerName}-1">
-        <span class="event__offer-title">${offerData.title}</span>
+        <span class="event__offer-title">${availableOffer.title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offerData.price}</span>
+        <span class="event__offer-price">${availableOffer.price}</span>
       </label>
     </div>`;
   }).join('');
@@ -119,7 +118,7 @@ const createOffersTemplate = (offers, offersData, isDisabled) => {
     class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${availableOffers}
+        ${offers}
       </div>
     </section>`;
 };
@@ -143,14 +142,7 @@ const createDestinationDescriptionTemplate = (destination) => {
 const createEditPointTemplate = (data, offersData, destinationsData) => {
   const { dateFrom, dateTo, type, destination, basePrice, offers, isDestination, isNew, isDisabled, isSaving, isDeleting } = data;
 
-  const typeTemplate = createTypeTemplate(type, isDisabled);
-  const destinationTemplate = createDestinationTemplate(type, destination, destinationsData, isDisabled);
-  const timeTemplate = createTimeTemplate(dateFrom, dateTo, isDisabled);
-
-  const availableOffers = offersData.get(type).offers;
-  const offersTemplate = offersData && offersData.size ? createOffersTemplate(offers, availableOffers, isDisabled) : '';
-
-  const destinationDescriptionTemplate = isDestination ? createDestinationDescriptionTemplate(destination) : '';
+  const availableOffersByType = offersData.get(type).offers;
 
   let resetButtonText = 'Delete';
 
@@ -159,6 +151,16 @@ const createEditPointTemplate = (data, offersData, destinationsData) => {
   } else if (isDeleting) {
     resetButtonText = 'Deleting';
   }
+
+  const typeTemplate = createTypeTemplate(type, isDisabled);
+  const destinationTemplate = createDestinationTemplate(type, destination, destinationsData, isDisabled);
+  const timeTemplate = createTimeTemplate(dateFrom, dateTo, isDisabled);
+  const offersTemplate = (availableOffersByType && availableOffersByType.length)
+    ? createOffersTemplate(offers, availableOffersByType, isDisabled)
+    : '';
+  const destinationDescriptionTemplate = isDestination
+    ? createDestinationDescriptionTemplate(destination)
+    : '';
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -260,11 +262,11 @@ export default class EditPoint extends SmartView {
   _setDatePicker() {
     this._destroyDatePicker();
 
-    const startDate = this.getElement().querySelector('#event-start-time-1');
-    const endDate = this.getElement().querySelector('#event-end-time-1');
+    const startDateElement = this.getElement().querySelector('#event-start-time-1');
+    const endDateElement = this.getElement().querySelector('#event-end-time-1');
 
     this._startDatePicker = flatpickr(
-      startDate,
+      startDateElement,
       Object.assign(
         {},
         DATEPICKER_CONFIG,
@@ -276,7 +278,7 @@ export default class EditPoint extends SmartView {
     );
 
     this._endDatePicker = flatpickr(
-      endDate,
+      endDateElement,
       Object.assign(
         {},
         DATEPICKER_CONFIG,
@@ -306,12 +308,11 @@ export default class EditPoint extends SmartView {
     }
 
     const type = evt.target.value;
-    const offers = this._offersData.get(type).offers;
+    //const offers = this._offersData.get(type).offers;
 
     this.updateData({
       type,
-      offers,
-      isOffers: offers.length > 0,
+      //offers,
     });
   }
 
@@ -368,14 +369,12 @@ export default class EditPoint extends SmartView {
   _offersChangeHandler(evt) {
     evt.preventDefault();
 
-    const parent = evt.target.closest('.event__offer-selector');
+    const parentElement = evt.target.closest('.event__offer-selector');
     const choosenOfferType = this._data.type;
-    const choosenOfferTitle = parent.querySelector('.event__offer-title').innerText;
+    const choosenOfferTitle = parentElement.querySelector('.event__offer-title').innerText;
+    const availableOffersByType = this._offersData.get(choosenOfferType).offers;
+    const choosenOffer = availableOffersByType.find((offer) => offer.title === choosenOfferTitle);
     const isChecked = evt.target.checked;
-
-    const availableOffers = this._offersData.get(choosenOfferType).offers;
-
-    const choosenOffer = availableOffers.find((offer) => offer.title === choosenOfferTitle);
 
     if (!this._data.offers) {
       this._data.offers = [];
@@ -410,7 +409,9 @@ export default class EditPoint extends SmartView {
       .querySelector('.event__input--price')
       .addEventListener('input', this._priceInputHandler);
 
-    if (this._offersData && this._offersData.size) {
+    const offersDataByType = this._offersData.get(this._data.type).offers;
+
+    if (offersDataByType && offersDataByType.length) {
       this
         .getElement()
         .querySelector('.event__available-offers')
@@ -453,7 +454,6 @@ export default class EditPoint extends SmartView {
       {},
       point,
       {
-        isOffers: point.offers.length > 0,
         isDestination: point.destination.description !== null,
         isNew: !point.id,
         isDisabled: false,
@@ -466,15 +466,10 @@ export default class EditPoint extends SmartView {
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
 
-    if (!data.isOffers) {
-      data.offers = [];
-    }
-
     if (!data.isDestination) {
       data.destination.description = null;
     }
 
-    delete data.isOffers;
     delete data.isDestination;
     delete data.isNew;
     delete data.isDisabled;

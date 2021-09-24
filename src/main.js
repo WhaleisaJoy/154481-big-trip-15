@@ -15,9 +15,9 @@ import Api from './api';
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 const AUTHORIZATION = 'Basic mn7fo4heYndp9du6b';
 
-const tripMain = document.querySelector('.trip-main');
-const pageMainBodyContainer = document.querySelector('.page-main .page-body__container');
-const tripEvents = document.querySelector('.trip-events');
+const tripMainElement = document.querySelector('.trip-main');
+const pageMainBodyContainerElement = document.querySelector('.page-main .page-body__container');
+const tripEventsElement = document.querySelector('.trip-events');
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -30,10 +30,10 @@ const TripControlsComponent = new TripControlsView();
 const siteMenuComponent = new MenuView();
 const pointNewButtonComponent = new PointNewButtonView();
 
-render(tripMain, TripControlsComponent, RenderPosition.AFTERBEGIN);
+render(tripMainElement, TripControlsComponent, RenderPosition.AFTERBEGIN);
 render(TripControlsComponent, siteMenuComponent, RenderPosition.BEFOREEND);
 
-const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, offersModel, destinationsModel, api);
+const tripPresenter = new TripPresenter(tripMainElement, tripEventsElement, pointsModel, filterModel, offersModel, destinationsModel, api);
 const filterPresenter = new FilterPresenter(TripControlsComponent, filterModel, pointsModel);
 
 let statisticsComponent = null;
@@ -51,13 +51,13 @@ const handleSiteMenuClick = (menuItem) => {
       siteMenuComponent.setMenuItem(menuItem);
       statisticsComponent = new StatisticsView(pointsModel.getPoints());
       filterPresenter.disable();
-      render(pageMainBodyContainer, statisticsComponent, RenderPosition.BEFOREEND);
+      render(pageMainBodyContainerElement, statisticsComponent, RenderPosition.BEFOREEND);
       break;
   }
 };
 
 const handlePointNewButtonClick = () => {
-  const isStatisticsOpened = pageMainBodyContainer.querySelector('.statistics');
+  const isStatisticsOpened = pageMainBodyContainerElement.querySelector('.statistics');
 
   if (isStatisticsOpened) {
     remove(statisticsComponent);
@@ -83,7 +83,7 @@ Promise.all([
     offersModel.setOffers(offers);
     destinationsModel.setDestinations(destinations);
     pointsModel.setPoints(UpdateType.INIT, points);
-    render(tripMain, pointNewButtonComponent, RenderPosition.BEFOREEND);
+    render(tripMainElement, pointNewButtonComponent, RenderPosition.BEFOREEND);
   })
   .catch(() => {
     offersModel.setOffers([]);
