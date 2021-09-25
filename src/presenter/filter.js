@@ -35,8 +35,8 @@ export default class Filter {
   }
 
   disable() {
-    const filterOptions = this._filterComponent.getElement().querySelectorAll('.trip-filters__filter-input');
-    filterOptions.forEach((option) => option.disabled = true);
+    const filterOptionElements = this._filterComponent.getElement().querySelectorAll('.trip-filters__filter-input');
+    filterOptionElements.forEach((option) => option.disabled = true);
   }
 
   _getFilters() {

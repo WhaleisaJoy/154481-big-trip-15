@@ -1,8 +1,6 @@
 import AbstractView from './abstract';
 import dayjs from 'dayjs';
-// eslint-disable-next-line no-undef
-const duration = require('dayjs/plugin/duration');
-dayjs.extend(duration);
+import { formatTimeSpendDuration } from '../utils/statistics';
 
 const createOffersListTemplate = (offers) => {
   const offersListItems = offers.map((offer) => `<li class="event__offer">
@@ -20,13 +18,9 @@ const createOffersListTemplate = (offers) => {
 };
 
 const getDateDifference = (dateFrom, dateTo) => {
-  const dateDuration = dayjs.duration(dayjs(dateTo).diff(dayjs(dateFrom)));
+  const dateDuration = dayjs(dateTo).diff(dayjs(dateFrom));
 
-  const dateDurationDays = dateDuration.$d.days ? `${dateDuration.$d.days}D` : '';
-  const dateDurationHours = dateDuration.$d.hours ? `${dateDuration.$d.hours}H` : '';
-  const dateDurationMinutes = dateDuration.$d.minutes ? `${dateDuration.$d.minutes}M` : '';
-
-  return `${dateDurationDays} ${dateDurationHours} ${dateDurationMinutes}`;
+  return formatTimeSpendDuration(dayjs(dateDuration));
 };
 
 

@@ -302,12 +302,12 @@ export default class Statistics extends SmartView {
       this._timeSpendChart = null;
     }
 
-    const moneyCtx = this.getElement().querySelector('#money');
-    const typeCtx = this.getElement().querySelector('#type');
-    const timeSpendCtx = this.getElement().querySelector('#time-spend');
+    const moneyCtxElement = this.getElement().querySelector('#money');
+    const typeCtxElement = this.getElement().querySelector('#type');
+    const timeSpendCtxElement = this.getElement().querySelector('#time-spend');
 
-    this._moneyChart = renderMoneyChart(moneyCtx, this._points);
-    this._typeChart = renderTypeChart(typeCtx, this._points);
-    this._timeSpendChart = renderTimeSpendChart(timeSpendCtx, this._points);
+    this._moneyChart = renderMoneyChart(moneyCtxElement, this._points);
+    this._typeChart = renderTypeChart(typeCtxElement, this._points);
+    this._timeSpendChart = renderTimeSpendChart(timeSpendCtxElement, this._points);
   }
 }

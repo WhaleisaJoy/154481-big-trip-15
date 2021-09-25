@@ -1,6 +1,7 @@
 import EditPointView from '../view/edit-point';
 import { RenderPosition, render, remove } from '../utils/render';
 import { UserActionType, UpdateType, TYPES } from '../const';
+import { isEscEvent } from '../utils/common';
 import dayjs from 'dayjs';
 
 const EMPTY_POINT = {
@@ -18,13 +19,13 @@ const EMPTY_POINT = {
 };
 
 export default class PointNew {
-  constructor(pointListContainer, changeData, offersModel, destinationsModel) {
-    this._pointListContainer = pointListContainer;
+  constructor(pointListContainerElement, changeData, offersModel, destinationsModel) {
+    this._pointListContainerElement = pointListContainerElement;
     this._changeData = changeData;
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
 
-    this._pointNewButtonComponent = document.querySelector('.trip-main__event-add-btn');
+    this._pointNewButtonElement = document.querySelector('.trip-main__event-add-btn');
 
     this._pointEditComponent = null;
 
@@ -41,13 +42,13 @@ export default class PointNew {
     this._offers = this._offersModel.getOffers();
     this._destinations = this._destinationsModel.getDestinations();
 
-    this._pointNewButtonComponent.disabled = true;
+    this._pointNewButtonElement.disabled = true;
     this._pointEditComponent = new EditPointView(EMPTY_POINT, this._offers, this._destinations);
 
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
-    render(this._pointListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
+    render(this._pointListContainerElement, this._pointEditComponent, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this._escKeyDownHandler);
   }
@@ -57,7 +58,7 @@ export default class PointNew {
       return;
     }
 
-    this._pointNewButtonComponent.disabled = false;
+    this._pointNewButtonElement.disabled = false;
 
     remove(this._pointEditComponent);
     this._pointEditComponent = null;
@@ -85,7 +86,7 @@ export default class PointNew {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (isEscEvent(evt)) {
       evt.preventDefault();
       this.destroy();
     }

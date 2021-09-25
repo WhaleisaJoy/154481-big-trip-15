@@ -2,6 +2,7 @@ import PointView from '../view/point';
 import EditPointView from '../view/edit-point';
 import { RenderPosition, render, replace, remove } from '../utils/render';
 import { UserActionType, UpdateType } from '../const';
+import { isEscEvent } from '../utils/common';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -15,8 +16,8 @@ export const State = {
 };
 
 export default class Point {
-  constructor(pointListContainer, changeData, changeMode, offersModel, destinationsModel) {
-    this._pointListContainer = pointListContainer;
+  constructor(pointListContainerElement, changeData, changeMode, offersModel, destinationsModel) {
+    this._pointListContainerElement = pointListContainerElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._destinationsModel = destinationsModel;
@@ -53,7 +54,7 @@ export default class Point {
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
-      render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
+      render(this._pointListContainerElement, this._pointComponent, RenderPosition.BEFOREEND);
       return;
     }
 
@@ -143,7 +144,7 @@ export default class Point {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (isEscEvent(evt)) {
       evt.preventDefault();
       this._replaceFormToPoint();
       document.removeEventListener('keydown', this._escKeyDownHandler);

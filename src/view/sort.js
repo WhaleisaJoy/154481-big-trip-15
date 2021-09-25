@@ -47,8 +47,8 @@ export default class Sort extends AbstractView {
       return;
     }
 
-    const tripSortInput = evt.target.parentElement.querySelector('.trip-sort__input');
-    if (tripSortInput.disabled) {
+    const tripSortInputElement = evt.target.parentElement.querySelector('.trip-sort__input');
+    if (tripSortInputElement.disabled) {
       return;
     }
 
