@@ -13,7 +13,7 @@ import { MenuItem, UpdateType, FilterType } from './const';
 import Api from './api';
 
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
-const AUTHORIZATION = 'Basic mn7fo4heYndp9du6b';
+const AUTHORIZATION = 'Basic yo6de5myOfgh5hd3c';
 
 const tripMainElement = document.querySelector('.trip-main');
 const pageMainBodyContainerElement = document.querySelector('.page-main .page-body__container');

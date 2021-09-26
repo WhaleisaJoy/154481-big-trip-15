@@ -307,12 +307,9 @@ export default class EditPoint extends SmartView {
       return;
     }
 
-    const type = evt.target.value;
-    //const offers = this._offersData.get(type).offers;
-
     this.updateData({
-      type,
-      //offers,
+      type: evt.target.value,
+      offers: [],
     });
   }
 
