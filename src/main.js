@@ -26,7 +26,6 @@ const storeName = {
   DESTINATIONS: `${STORE_PREFIX}-destinations-${STORE_VER}`,
 };
 
-
 const tripMainElement = document.querySelector('.trip-main');
 const pageMainBodyContainerElement = document.querySelector('.page-main .page-body__container');
 const tripEventsElement = document.querySelector('.trip-events');
