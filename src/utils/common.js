@@ -9,3 +9,5 @@ export const sortPointsByPrice = (a, b) => b.basePrice - a.basePrice;
 export const replaceString = (string) => string.replace(/\s/g, '-');
 
 export const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
+export const isOnline = () => window.navigator.onLine;
