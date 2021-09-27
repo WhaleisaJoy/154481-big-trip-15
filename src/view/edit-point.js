@@ -302,11 +302,6 @@ export default class EditPoint extends SmartView {
 
   _typeChangeHandler(evt) {
     evt.preventDefault();
-
-    if (evt.target.tagName !== 'INPUT') {
-      return;
-    }
-
     this.updateData({
       type: evt.target.value,
       offers: [],
